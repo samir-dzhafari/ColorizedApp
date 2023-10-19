@@ -15,6 +15,11 @@ final class SettingsViewController: UIViewController {
     
     @IBOutlet weak var colorPresenterView: UIView!
     
+    
+    @IBOutlet weak var redLabel: UILabel!
+    @IBOutlet weak var greenLabel: UILabel!
+    @IBOutlet weak var blueLabel: UILabel!
+    
     @IBOutlet weak var redSlider: UISlider!
     @IBOutlet weak var greenSlider: UISlider!
     @IBOutlet weak var blueSlider: UISlider!
@@ -29,9 +34,12 @@ final class SettingsViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-    
-        setupSliders()
-        setupTextFields()
+        
+        let pallete = getPallete(color)
+        
+        setupLabels(pallete: pallete)
+        setupSliders(pallete: pallete)
+        setupTextFields(pallete: pallete)
         setupKeyboardToolBar()
         
         colorPresenterView.backgroundColor = color
@@ -49,11 +57,11 @@ final class SettingsViewController: UIViewController {
     @IBAction func colorSliderChange(_ sender: UISlider) {
         switch sender {
         case redSlider:
-            redTextField.text = formatValue(sender.value)
+            updateUI(label: redLabel, textField: redTextField, sender.value)
         case greenSlider:
-            greenTextField.text = formatValue(sender.value)
+            updateUI(label: greenLabel, textField: greenTextField, sender.value)
         default:
-            blueTextField.text = formatValue(sender.value)
+            updateUI(label: blueLabel, textField: blueTextField, sender.value)
         }
         
         updateColorViewPresenter()
@@ -76,24 +84,27 @@ final class SettingsViewController: UIViewController {
 // MARK: - Setup methods
 
 extension SettingsViewController {
-    private func setupSliders() {
-        let ciColor = CIColor(color: color)
-        
-        redSlider.value = Float(ciColor.red)
-        greenSlider.value = Float(ciColor.green)
-        blueSlider.value = Float(ciColor.blue)
+    
+    private func setupLabels(pallete: Pallete) {
+        redLabel.text = formatValue(pallete.red)
+        greenLabel.text = formatValue(pallete.green)
+        blueLabel.text = formatValue(pallete.blue)
     }
     
-    private func setupTextFields() {
-        let ciColor = CIColor(color: color)
-        
+    private func setupSliders(pallete: Pallete) {
+        redSlider.value = pallete.red
+        greenSlider.value = pallete.green
+        blueSlider.value = pallete.blue
+    }
+    
+    private func setupTextFields(pallete: Pallete) {
         redTextField.delegate = self
         greenTextField.delegate = self
         blueTextField.delegate = self
 
-        redTextField.text = formatValue(Float(ciColor.red))
-        greenTextField.text = formatValue(Float(ciColor.green))
-        blueTextField.text = formatValue(Float(ciColor.blue))
+        redTextField.text = formatValue(pallete.red)
+        greenTextField.text = formatValue(pallete.green)
+        blueTextField.text = formatValue(pallete.blue)
     }
     
     private func setupKeyboardToolBar() {
@@ -146,15 +157,15 @@ extension SettingsViewController: UITextFieldDelegate {
         
         switch textField {
         case redTextField:
-            redSlider.value = value
+            updateUI(label: redLabel, slider: redSlider, value)
         case greenTextField:
-            greenSlider.value = value
+            updateUI(label: greenLabel, slider: greenSlider, value)
         default:
-            blueSlider.value = value
+            updateUI(label: blueLabel, slider: blueSlider, value)
         }
         
         if let text = textField.text {
-            textField.text = formatValue(Float(text) ?? 0)
+            textField.text = formatValue(value)
         }
      
         
@@ -192,6 +203,22 @@ extension SettingsViewController {
         )
     }
     
+    // Можно было бы дженерики заюзать, но мы не изучали, либо тип Any, но я хотел сделать типизацию
+    
+    private func updateUI(label: UILabel, textField: UITextField, _ value: Float) {
+        let value = formatValue(value)
+        
+        label.text = value
+        textField.text = value
+    }
+    
+    private func updateUI(label: UILabel, slider: UISlider, _ value: Float) {
+        let stringValue = formatValue(value)
+        
+        label.text = stringValue
+        slider.value = value
+    }
+    
     private func showAlert() {
         let alert = UIAlertController(
             title: "Wrong format!",
@@ -208,6 +235,14 @@ extension SettingsViewController {
 // MARK: - Helper methods
 
 extension SettingsViewController {
+    
+    private typealias Pallete = (red: Float, green: Float, blue: Float)
+    
+    private func getPallete(_ color: UIColor) -> Pallete {
+        let ciColor = CIColor(color: color)
+        return (Float(ciColor.red), Float(ciColor.green), Float(ciColor.blue))
+    }
+    
     private func formatValue(_ number: Float) -> String {
         let numberFormatter = NumberFormatter()
 

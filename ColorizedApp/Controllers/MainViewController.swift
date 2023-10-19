@@ -27,10 +27,10 @@ final class MainViewController: UIViewController {
 // MARK: - SettingsViewControllerDelegate
 
 extension MainViewController: SettingsViewControllerDelegate {
+    
     func doneButtonPressed(_ color: UIColor) {
         view.backgroundColor = color
     }
-    
     
 }
 

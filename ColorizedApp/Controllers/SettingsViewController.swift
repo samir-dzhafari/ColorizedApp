@@ -164,7 +164,7 @@ extension SettingsViewController: UITextFieldDelegate {
             updateUI(label: blueLabel, slider: blueSlider, value)
         }
         
-        if let text = textField.text {
+        if textField.text != nil {
             textField.text = formatValue(value)
         }
      

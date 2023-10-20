@@ -15,7 +15,6 @@ final class SettingsViewController: UIViewController {
     
     @IBOutlet weak var colorPresenterView: UIView!
     
-    
     @IBOutlet weak var redLabel: UILabel!
     @IBOutlet weak var greenLabel: UILabel!
     @IBOutlet weak var blueLabel: UILabel!
